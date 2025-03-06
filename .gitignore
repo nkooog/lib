@@ -116,7 +116,7 @@ out
 *.class
 *.war
 *.jar
-/target/
+*/target/
 /build/
 /out/
 /.idea/
