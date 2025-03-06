@@ -1,17 +1,4 @@
 server:
-  port: 45000  # 포트 유지
-
-spring:
-  application:
-    name: eureka
-
-eureka:
-  instance:
-    prefer-ip-address: true  # IP 주소 사용 선호 (로컬 및 배포 환경 모두 호환 가능)
-  client:
-    register-with-eureka: false  # Eureka 서버는 자신을 등록하지 않음
-    fetch-registry: false        # 레지스트리 가져오지 않음
-    service-url:
-      defaultZone: http://${eureka.instance.hostname:localhost}:${server.port}/eureka/  # 동적으로 호스트와 포트 반영
-  server:
-    enable-self-preservation: false  # 테스트 환경용으로 유지 (프로덕션에서는 true 권장)
+  port: 45000
+  profiles:
+    active: local
