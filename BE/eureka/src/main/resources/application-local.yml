@@ -1,17 +1,7 @@
-server:
-  port: 45000  # 기본값 45000, 환경 변수로 변경 가능
-
-spring:
-  application:
-    name: localhost
-
 eureka:
   instance:
-    prefer-ip-address: true  # IP 주소 사용 선호 (로컬 및 배포 환경 모두 호환 가능)
+    hostname: localhost  # 로컬에서 실행할 때는 localhost 사용
+
   client:
-    register-with-eureka: false  # Eureka 서버는 자신을 등록하지 않음
-    fetch-registry: false        # 레지스트리 가져오지 않음
     service-url:
-      defaultZone: http://localhost:${SERVER_PORT}/eureka/  # Eureka 서버 주소 자동 반영
-  server:
-    enable-self-preservation: false  # 테스트 환경용으로 유지 (프로덕션에서는 true 권장)
+      defaultZone: http://localhost:45000/eureka/  # 로컬에서 Eureka 서버 접근

@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - app_network
+
+  eureka-service:
+    image: eureka   # 이미지 이름
+    build:
+      context: ./BE/eureka  # Dockerfile이 있는 디렉토리
+      dockerfile: Dockerfile.local # Dockerfile 이름
+    container_name: eureka # 컨테이너 이름
+    ports:
+      - "45000:45000" # 포트 매핑
+      - "45100:45100" # 디버그 포트 매핑
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker  # Docker 실행 시 docker 프로파일 사용
+    networks:
+      - app_network # 네트워크 연결
+
+volumes:
+  redis_data:
+
+networks:
+  app_network:
+    name: app_network
+    driver: bridge

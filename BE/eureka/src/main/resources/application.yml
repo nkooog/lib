@@ -1,4 +1,19 @@
 server:
-  port: 45000
+  port: 45000  # 기본 포트
+
+spring:
+  application:
+    name: eureka-service
   profiles:
-    active: local
+    active: local  # 기본적으로 로컬 환경 사용
+
+eureka:
+  instance:
+    prefer-ip-address: false
+
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+
+  server:
+    enable-self-preservation: true
