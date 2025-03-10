@@ -1,0 +1,4 @@
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka-service:45001/eureka/  # Docker 네트워크에서는 고정된 도메인 사용

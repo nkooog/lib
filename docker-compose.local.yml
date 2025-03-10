@@ -1,17 +1,19 @@
 version: '3.8'
 
 services:
-  auth:
-    image: auth
+  auth-service:
+    image: auth-service
     build:
-      context: ./BE/auth
+      context: ./BE/auth-service
       dockerfile: Dockerfile.local # Dockerfile 이름
-    container_name: auth
+    container_name: auth-service
     ports:
       - "45002:45002"
       - "45102:45102"
     environment:
       - SPRING_PROFILES_ACTIVE=docker  # Docker 실행 시 docker 프로파일 사용
+    depends_on:
+      - eureka-service # 의존성 설정
     networks:
       - app_network # 네트워크 연결
 
@@ -27,12 +29,12 @@ services:
     ports:
       - "45020:6379" # 포트 매핑
 
-  eureka:
-    image: eureka   # 이미지 이름
+  eureka-service:
+    image: eureka-service   # 이미지 이름
     build:
-      context: ./BE/eureka  # Dockerfile이 있는 디렉토리
+      context: ./BE/eureka-service # Dockerfile이 있는 디렉토리
       dockerfile: Dockerfile.local # Dockerfile 이름
-    container_name: eureka # 컨테이너 이름
+    container_name: eureka-service # 컨테이너 이름
     ports:
       - "45001:45001" # 포트 매핑
     environment:
@@ -40,17 +42,17 @@ services:
     networks:
       - app_network # 네트워크 연결
 
-  gateway:
-    image: gateway # 이미지 이름
+  gateway-service:
+    image: gateway-service # 이미지 이름
     build:
-      context: ./BE/gateway # Dockerfile이 있는 디렉토리
+      context: BE/gateway-service # Dockerfile이 있는 디렉토리
       dockerfile: Dockerfile.local # Dockerfile 이름
-    container_name: gateway # 컨테이너 이름
+    container_name: gateway-service # 컨테이너 이름
     ports:
       - "45000:45000" # 포트 매핑
       - "45100:45100" # 디버그 포트 매핑
     depends_on:
-      - eureka # 의존성 설정
+      - eureka-service # 의존성 설정
     environment:
       - JWT_SECRET=c2huZWEtc2VjdXJpdHktamV0LWVuY29kaW5nLWtleQ==
       - SPRING_PROFILES_ACTIVE=docker # Docker 실행 시 docker 프로파일 사용

@@ -1,0 +1,7 @@
+eureka:
+  instance:
+    hostname: eureka-service  # 컨테이너 내부에서 사용될 고정된 호스트네임
+
+  client:
+    service-url:
+      defaultZone: http://eureka-service:45001/eureka/  # Docker 네트워크에서 Eureka 접근
