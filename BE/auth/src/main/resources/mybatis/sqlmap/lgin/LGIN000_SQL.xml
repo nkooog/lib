@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sqlmap.sysm.user.LGIN000_SQL">
+
+	<select id="LGIN000SEL05" parameterType="LGIN000DTO" resultType="int">
+		SELECT
+			coalesce(pw_err_tcnt,0) AS pwErrTcnt
+		FROM  t_usr_info_mgnt
+		WHERE 1=1
+		  AND   tenant_id = #{tenantId}
+		  AND   usr_id    = #{usrId}
+	</select>
+
+	<!-- 사용자 정보 조회(login 검증용) -->
+	<select id="LGIN000SEL07" parameterType="LGIN000DTO" resultType="LGIN000VO">
+		SELECT
+			  tenant_id                 AS tenantId
+		,     usr_id                    AS usrId
+		,     usr_nm                    AS usrNm
+		,     scrt_no                   AS scrtNo
+		,     ac_st_cd                  AS acStCd
+		,     ac_st_rsn_cd              AS acStRsnCd
+		,     scrt_no_lst_upd_dtm       AS scrtNoLstUpdDtm
+		,     pw_err_tcnt               AS pwErrTcnt
+		,     org_cd                    AS orgCd
+		,     qual_acqs_dd              AS qualAcqsDd
+		,     qual_loss_dd              AS qualLossDd
+		,     usr_grd                   AS usrGrd
+		,     #{mlingCd}                AS mlingCd
+		FROM  t_usr_info_mgnt
+		<where>
+			<if test="tenantId != null and tenantId != ''">
+				AND	tenant_id                 = #{tenantId}
+			</if>
+			<if test="usrId != null and usrId != ''">
+				AND	usr_id               	  = #{usrId}
+			</if>
+		</where>
+	</select>
+
+	<select id="LGIN000SEL08" parameterType="LGIN000VO" resultType="LGIN000VO">
+		SELECT
+			   tenant_id     AS tenantId
+			 , bs_vl_mgnt_no AS bsVlMgntNo
+			 , bs_vl_nm      AS bsVlNm
+			 , bs_vl1        AS bsVl1
+			 , bs_vl2        AS bsVl2
+			 , bs_vl3        AS bsVl3
+			 , use_yn        AS useYn
+		FROM T_BASC_VLU_INFO
+		WHERE tenant_id     = #{tenantId}
+		  AND bs_vl_mgnt_no = #{bsVlMgntNo}
+		  AND use_yn        = 'Y'
+		ORDER BY tenant_id, bs_vl_mgnt_no
+	</select>
+
+	<!-- 비밀번호 오류횟수 초과 또는 비밀번호 변경일 만료로 사용만료가 된 경우 -->
+	<update id="LGIN000UPT01" parameterType="LGIN000VO">
+		UPDATE t_usr_info_mgnt
+		SET    ac_st_cd              =  #{acStCd}      <!-- 계정상태코드     : 1.정상, 2.계정잠김, 3.휴면 , 9 사용만료 -->
+		,  ac_st_rsn_cd          =  #{acStRsnCd}       <!-- 계정상태사유코드 : 1.로그인, 2.로그아웃,  3.비밀번호오류, 9.사용기간만료 -->
+		,  lst_corc_dtm          =  NOW()
+		,  lst_corpr_id          =  #{usrId}
+		,  lst_corpr_org_cd      =  #{orgCd}
+		<where>
+			AND   tenant_id              = #{tenantId}
+			AND   usr_id                 = #{usrId}
+		</where>
+	</update>
+
+	<!-- 정상 로그인인 경우 -->
+	<update id="LGIN000UPT02" parameterType="LGIN000VO">
+		UPDATE t_usr_info_mgnt
+		SET    ac_st_cd              =  '1'       <!-- 1. 정상 -->
+		,  ac_st_rsn_cd          =  '1'       <!-- 1. 로그인 -->
+		,  pw_err_tcnt           =  0         <!-- 오류건수 초기화 -->
+		,  lst_lgin_dtm          =  NOW()
+		<!-- 사용자가 자리를 바꾸면 텔레셋 정보의 ip와 내선번호를 옮길 자리의 것으로 변경해줘야 함. -->
+		,  (lst_lgin_ip_addr,  lst_lgin_ext_no) = (SELECT use_term_ip_addr, ext_no
+		FROM   t_tele_set_inf
+		WHERE  tenant_id = #{tenantId}
+		AND    usr_id    = #{usrId})
+		,  lst_corc_dtm          =  NOW()
+		,  lst_corpr_id          =  #{usrId}
+		,  lst_corpr_org_cd      =  #{orgCd}
+		<where>
+			AND   tenant_id              =  #{tenantId}
+			AND   usr_id                 =  #{usrId}
+		</where>
+	</update>
+
+	<!-- 비밀번호 오류허용횟수 이내에서 비밀번호만 틀린 경우 -->
+	<update id="LGIN000UPT04" parameterType="LGIN000VO">
+		UPDATE t_usr_info_mgnt
+		SET    ac_st_rsn_cd      =  '3'         <!-- 3. 비밀번호오류 -->
+		,  pw_err_tcnt           =  coalesce(pw_err_tcnt,0) + 1
+		,  lst_corc_dtm          =  NOW()
+		,  lst_corpr_id          =  #{usrId}
+		,  lst_corpr_org_cd      =  #{orgCd}
+		<where>
+			AND   tenant_id              = #{tenantId}
+			AND   usr_id                 = #{usrId}
+		</where>
+	</update>
+
+	<!-- 로그인 이력생성 : 로그인 경우 -->
+	<insert id="LGIN000INS01" parameterType="LGIN000VO">
+		INSERT INTO t_sys_log (tenant_id, usr_id, sys_log_seq, sys_log_dd_si, sys_log_dv_cd, data_frme_no, pgm_id, sys_log_msg, evnt_rslt_cd, reg_dtm)
+		VALUES (
+				 #{tenantId}
+			   , #{usrId}
+			   , (select coalesce(max(sys_log_seq),0)+1 from t_sys_log where tenant_id = #{tenantId} and usr_id = #{usrId})
+			   , current_date
+			   , #{sysLogDvCd}
+			   , null
+			   , 'LGIN000M'
+			   , #{sysLogMsg}
+			   , null
+			   , now()
+			   )
+	</insert>
+
+</mapper>

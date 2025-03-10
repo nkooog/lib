@@ -1,6 +1,20 @@
 version: '3.8'
 
 services:
+  auth:
+    image: auth
+    build:
+      context: ./BE/auth
+      dockerfile: Dockerfile.local # Dockerfile 이름
+    container_name: auth
+    ports:
+      - "45002:45002"
+      - "45102:45102"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker  # Docker 실행 시 docker 프로파일 사용
+    networks:
+      - app_network # 네트워크 연결
+
   redis:
     image: redis:latest
     container_name: redis
@@ -10,6 +24,8 @@ services:
     command: redis-server --appendonly yes
     networks:
       - app_network
+    ports:
+      - "45020:6379" # 포트 매핑
 
   eureka:
     image: eureka   # 이미지 이름
