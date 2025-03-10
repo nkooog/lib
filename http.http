@@ -1,0 +1,7 @@
+############# 2.1 진료과 조회(API020001)
+POST http://localhost:45002/auth/login
+Content-Type: application/json
+
+{
+
+}

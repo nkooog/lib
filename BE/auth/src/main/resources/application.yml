@@ -10,6 +10,12 @@ jwt:
 spring:
   application:
     name: auth
+
+  cloud:
+    openfeign:
+      enabled: true  # Feign 사용
+      httpclient:
+        enabled: true  # 최신 HttpClient 사용
   data:
     redis:
       host: redis
