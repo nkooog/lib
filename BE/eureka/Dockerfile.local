@@ -8,7 +8,7 @@ WORKDIR /app
 COPY target/eureka-0.0.1-SNAPSHOT.jar app.jar
 
 # 4. 디버그 옵션 추가
-ENV JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:32101"
+ENV JAVA_TOOL_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:45100"
 
 # 5. JAR 실행 (디버그 모드 포함)
 CMD ["java", "-jar", "/app/app.jar"]
