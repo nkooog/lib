@@ -4,4 +4,4 @@ eureka:
 
   client:
     service-url:
-      defaultZone: http://localhost:45000/eureka/  # 로컬에서 Eureka 서버 접근
+      defaultZone: http://localhost:45001/eureka/  # 로컬에서 Eureka 서버 접근

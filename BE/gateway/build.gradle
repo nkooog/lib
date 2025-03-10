@@ -1,0 +1,50 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'bcs.aicrm.broadcns'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+ext {
+    set('springCloudVersion', "2024.0.0")  // ✅ 공식적으로 호환되는 버전
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+dependencies {
+    // ✅ Spring Cloud Gateway 관련 의존성 (필수)
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway'
+
+    // ✅ Spring WebFlux (Gateway 필터는 WebFlux 기반이므로 필요)
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    // Eureka Client
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    // ✅ JWT 검증 관련 라이브러리
+    implementation 'io.jsonwebtoken:jjwt-api:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-impl:0.11.5'
+    implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'
+
+    // ✅ Reactor Core (Spring WebFlux에서 비동기 처리)
+    implementation 'io.projectreactor:reactor-core:3.5.5'
+
+    // ✅ 테스트 관련 (필요 없으면 삭제 가능)
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}

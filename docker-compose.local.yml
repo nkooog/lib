@@ -18,10 +18,26 @@ services:
       dockerfile: Dockerfile.local # Dockerfile 이름
     container_name: eureka # 컨테이너 이름
     ports:
-      - "45000:45000" # 포트 매핑
-      - "45100:45100" # 디버그 포트 매핑
+      - "45001:45001" # 포트 매핑
     environment:
       - SPRING_PROFILES_ACTIVE=docker  # Docker 실행 시 docker 프로파일 사용
+    networks:
+      - app_network # 네트워크 연결
+
+  gateway:
+    image: gateway # 이미지 이름
+    build:
+      context: ./BE/gateway # Dockerfile이 있는 디렉토리
+      dockerfile: Dockerfile.local # Dockerfile 이름
+    container_name: gateway # 컨테이너 이름
+    ports:
+      - "45000:45000" # 포트 매핑
+      - "45100:45100" # 디버그 포트 매핑
+    depends_on:
+      - eureka # 의존성 설정
+    environment:
+      - JWT_SECRET=c2huZWEtc2VjdXJpdHktamV0LWVuY29kaW5nLWtleQ==
+      - SPRING_PROFILES_ACTIVE=docker # Docker 실행 시 docker 프로파일 사용
     networks:
       - app_network # 네트워크 연결
 
