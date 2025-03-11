@@ -18,7 +18,7 @@ public class SecurityConfig {
 
 	private final JwtFilter filter;
 	private final JwtAuthencationEntryPoint entryPoint;
-	private final String[] AUTH = {"/h2-console/**","/favicon.ico","/auth/login", "/swagger-ui/**", "/v3/api-docs/**", "/swagger.html","/auth/health"};
+	private final String[] AUTH = {"/auth/login","/auth/health", "/swagger-ui/**", "/v3/api-docs/**", "/swagger.html"};
 
 	public SecurityConfig(JwtFilter filter, JwtAuthencationEntryPoint entryPoint) {
 		this.filter = filter;

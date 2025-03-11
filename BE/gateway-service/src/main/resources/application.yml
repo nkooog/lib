@@ -28,13 +28,14 @@ spring:
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/**
+            - Path=/auth/health
+          filters:
+            - AuthenticationFilter
 #        - id: user-service
 #          uri: lb://user-service
 #          predicates:
 #            - Path=/users/**
-#          filters:
-#            - AuthenticationFilter
+
 
 eureka:
   client:

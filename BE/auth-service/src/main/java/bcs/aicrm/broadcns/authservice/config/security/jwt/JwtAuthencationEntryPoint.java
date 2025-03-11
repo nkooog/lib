@@ -32,8 +32,9 @@ public class JwtAuthencationEntryPoint implements AuthenticationEntryPoint {
 
 		object.put("message", authException.getMessage());
 		object.put("status", response.getStatus());
+		object.put("path", request.getRequestURI());
 
-		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		response.setContentType("application/json;charset=UTF-8");
 		response.getWriter().write(this.objectMapper.writeValueAsString(object));
 	}
 

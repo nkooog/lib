@@ -13,6 +13,7 @@ import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -44,18 +45,25 @@ public class JwtFilter extends OncePerRequestFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-		String token = this.resolveToken(request);
-		JSONObject json = new JSONObject();
 		try {
-			if( token != null ) {
 
+			/*String authorizationHeader = request.getHeader(this.authHeader);
+			if (authorizationHeader == null) {
+				throw new BadCredentialsException("헤더 누락");
+			}*/
+
+			String token = this.resolveToken(request);
+
+			if( token != null ) {
 				Authentication authentication = this.provider.getAuthentication(token);
 
 				if(authentication!=null)  {
 					// 다음 filter로 가기전 authentication 정보는 SecurityContextHolder에 담는다.
 					SecurityContextHolder.getContext().setAuthentication(authentication);
 				}
-			}
+			}/*else{
+				throw new BadCredentialsException("토큰 누락 또는 잘못된 토큰 형태임");
+			}*/
 		}catch (MalformedJwtException e) {
 			response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 			this.jwtAuthencationEntryPoint.commence(request, response, new BadCredentialsException(e.getMessage()));
@@ -76,6 +84,14 @@ public class JwtFilter extends OncePerRequestFilter {
 			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
 			this.jwtAuthencationEntryPoint.commence(request, response, e);
 			return;
+		}catch (AuthenticationException e) {
+			response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+			this.jwtAuthencationEntryPoint.commence(request, response, e);
+			return;
+		}
+
+		if( SecurityContextHolder.getContext().getAuthentication() == null ) {
+			return;
 		}
 
 		filterChain.doFilter(request, response);
@@ -87,6 +103,11 @@ public class JwtFilter extends OncePerRequestFilter {
 			return bearerToken.substring(7);
 		}
 		return null;
+	}
+
+	@Override
+	protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+		return request.getRequestURI().startsWith("/auth/login");
 	}
 
 }

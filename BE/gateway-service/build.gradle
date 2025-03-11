@@ -47,4 +47,8 @@ dependencies {
     // ✅ 테스트 관련 (필요 없으면 삭제 가능)
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Lombok
+    implementation("org.projectlombok:lombok")
+    annotationProcessor("org.projectlombok:lombok")
 }
