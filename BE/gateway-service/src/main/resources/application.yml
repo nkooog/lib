@@ -25,16 +25,21 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        - id: auth-service1
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/login
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/auth/health
+            - Path=/auth/**
           filters:
             - AuthenticationFilter
-#        - id: user-service
-#          uri: lb://user-service
-#          predicates:
-#            - Path=/users/**
+            - args:
+      default-filters:
+        - name: AuthenticationFilter
+          args:
+            baseMessage : ${}
 
 
 eureka:

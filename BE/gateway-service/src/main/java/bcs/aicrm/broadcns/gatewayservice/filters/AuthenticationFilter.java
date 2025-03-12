@@ -7,7 +7,6 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
-import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -19,29 +18,22 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     @Override
     public GatewayFilter apply(Config config) {
+        log.debug(" ##################################### ");
         // Global Pre Filter
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
             log.debug("Global Filter baseMessage : {}", config.getBaseMessage());
-            if(config.isPreLogger()){
-                log.debug("Global Filter Start : request id -> {}", request.getId());
-            }
+            log.debug("requestUrl : {}", request.getURI());
 
             // Global Post Filter
-            return chain.filter(exchange).then(Mono.fromRunnable(() -> {
-                if(config.isPostLogger()) {
-                    log.debug("Global Filter End : response code -> {}", response.getStatusCode());
-                }
-            }));
+            return chain.filter(exchange);
         };
     }
 
     @Data
     public static class Config {
         private String baseMessage;
-        private boolean preLogger;
-        private boolean postLogger;
     }
 }

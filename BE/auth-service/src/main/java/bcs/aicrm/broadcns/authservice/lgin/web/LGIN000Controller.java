@@ -38,7 +38,8 @@ public class LGIN000Controller implements LGIN000API {
 
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
-        return ResponseEntity.ok("Auth Service is Running");
+		log.debug(" test ");
+        return ResponseEntity.ok().body("test");
     }
 
 	@Autowired

@@ -6,6 +6,6 @@ eureka:
 
 logging:
   level:
-    org:
-      springframework:
-        web: debug
+    bcs: debug
+    web: error
+
