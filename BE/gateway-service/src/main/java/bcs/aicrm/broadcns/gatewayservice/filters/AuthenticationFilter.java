@@ -7,6 +7,7 @@ import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFac
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @Component
@@ -28,7 +29,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             log.debug("requestUrl : {}", request.getURI());
 
             // Global Post Filter
-            return chain.filter(exchange);
+            return chain.filter(exchange).then(Mono.fromRunnable(() -> {    // Mono : 비동기 방식의 서버에서 단일값을 전달할 때 사용
+                log.debug("Custom POST filter : response code -> {}", response.getStatusCode());
+            }));
         };
     }
 

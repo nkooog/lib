@@ -5,3 +5,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka-service:45001/eureka/  # Docker 네트워크에서 Eureka 접근
+
+logging:
+  level:
+    bcs: debug
+    sql: info

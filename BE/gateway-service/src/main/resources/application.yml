@@ -34,13 +34,9 @@ spring:
           predicates:
             - Path=/auth/**
           filters:
-            - AuthenticationFilter
-            - args:
-      default-filters:
-        - name: AuthenticationFilter
-          args:
-            baseMessage : ${}
-
+            - name: AuthenticationFilter
+              args:
+                baseMessage: Target Filter 설정입니다.
 
 eureka:
   client:
