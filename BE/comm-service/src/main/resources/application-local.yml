@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:log4jdbc:postgresql://192.168.199.11:5432/crmdb
+    username: appcrm
+    password: appcrm2302!
+    driver-class-name: net.sf.log4jdbc.sql.jdbcapi.DriverSpy
+    dbcp2:
+      connection-init-sqls: SET TIMEZONE TO 'Asia/Seoul'
+      test-on-borrow: true
+      validation-query: SELECT 1
+    tomcat:
+      max-active: 300
+      max-idle: 100
+      max-wait: 10000
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

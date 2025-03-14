@@ -17,7 +17,23 @@ services:
     networks:
       - app_network # 네트워크 연결
 
-  redis:
+  comm-service:
+    image : comm-service
+    build:
+      context: ./BE/comm-service
+      dockerfile: Dockerfile.local
+    container_name: comm-service
+    ports:
+      - "45003:45003"
+      - "45103:45103"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - eureka-service
+    networks:
+      - app_network
+
+  redis-service:
     image: redis:latest
     container_name: redis
     restart: always

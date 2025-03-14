@@ -38,7 +38,7 @@ public class LGIN000Controller implements LGIN000API {
 
     @GetMapping("/health")
     public ResponseEntity<String> healthCheck() {
-		log.debug(" test ");
+		log.debug("test");
         return ResponseEntity.ok().body("test");
     }
 
@@ -62,47 +62,29 @@ public class LGIN000Controller implements LGIN000API {
 			return ResponseEntity.badRequest().body(errors);
 		}
 
-		try {
-			Authentication authentication = this.authService.authenticate(lgin000DTO);
-			status = this.provider.isValidToken(authentication);
+		Authentication authentication = this.authService.authenticate(lgin000DTO);
+		status = this.provider.isValidToken(authentication);
 
-			buffer.append(lgin000DTO.getTenantId());
-			buffer.append(this.SEPARATOR);
-			buffer.append(lgin000DTO.getUsrId());
+		buffer.append(lgin000DTO.getTenantId());
+		buffer.append(this.SEPARATOR);
+		buffer.append(lgin000DTO.getUsrId());
 
-			switch (status) {
-				case OK -> {
-					String refresh = (String) this.redisTemplate.opsForValue().get(buffer.toString());
-					Claims claims = this.provider.parseClaims(refresh);
-					json.put("result", JwtToken.builder()
-							.refreshToken(refresh)
-							.refreshTokenExpiration(dateFormat.format(claims.getExpiration()))
-							.build());
-				}
-				case CREATED -> {
-					JwtToken jwtToken = this.provider.generateToken(authentication);
-					json.put("status" , HttpStatus.CREATED.value());
-					json.put("message", HttpStatus.CREATED);
-					json.put("result" , jwtToken);
-				}
+		switch (status) {
+			case OK -> {
+				String refresh = (String) this.redisTemplate.opsForValue().get(buffer.toString());
+				Claims claims = this.provider.parseClaims(refresh);
+				json.put("result", JwtToken.builder()
+						.refreshToken(refresh)
+						.refreshTokenExpiration(dateFormat.format(claims.getExpiration()))
+						.build());
 			}
-		}catch (ExpiredJwtException e) {
-			status = HttpStatus.FORBIDDEN;
-
-			json.put("status" , HttpStatus.FORBIDDEN.value());
-			json.put("message", "만료된 토큰입니다.");
-		}catch (BadCredentialsException e) {
-			status = HttpStatus.BAD_REQUEST;
-
-			json.put("status" , HttpStatus.BAD_REQUEST.value());
-			json.put("message", e.getMessage());
-		}catch (UsernameNotFoundException e) {
-			status = HttpStatus.NOT_FOUND;
-
-			json.put("status" , HttpStatus.NOT_FOUND.value());
-			json.put("message", e.getMessage());
+			case CREATED -> {
+				JwtToken jwtToken = this.provider.generateToken(authentication);
+				json.put("status" , HttpStatus.CREATED.value());
+				json.put("message", HttpStatus.CREATED);
+				json.put("result" , jwtToken);
+			}
 		}
-
 
 		return ResponseEntity.status(status).body(json);
 

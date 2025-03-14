@@ -1,10 +1,10 @@
 server:
   port: 45000
 
-jwt:
-  secret: ${JWT_SECRET}
-
 spring:
+  jwt :
+    secret : 7696df8573fd07575d6debf0c10c51719d64c9402e43da5665f2dc3868107762
+    type : Bearer
   application:
     name: gateway-service
   profiles:
@@ -25,18 +25,19 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
-        - id: auth-service1
+        - id: auth-login
           uri: lb://auth-service
           predicates:
             - Path=/auth/login
-        - id: auth-service
-          uri: lb://auth-service
-          predicates:
-            - Path=/auth/**
           filters:
             - name: AuthenticationFilter
               args:
-                baseMessage: Target Filter 설정입니다.
+                baseMessage: Test 설정입니다.
+        - id: test-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+
 
 eureka:
   client:
@@ -45,3 +46,10 @@ eureka:
   instance:
     prefer-ip-address: true
     instance-id: ${spring.application.name}:${random.uuid}
+
+
+logging:
+  level:
+    bcs : debug
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

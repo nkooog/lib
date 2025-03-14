@@ -2,6 +2,7 @@ package bcs.aicrm.broadcns.authservice.config.security.auth;
 import bcs.aicrm.broadcns.authservice.lgin.model.DTO.LGIN000DTO;
 import bcs.aicrm.broadcns.authservice.lgin.model.VO.LGIN000VO;
 import bcs.aicrm.broadcns.authservice.lgin.service.LGIN000Service;
+import bcs.aicrm.broadcns.authservice.util.AES256Crypt;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -50,11 +51,8 @@ public class AuthenticationService {
 			message = this.messageSource.getMessage("LGIN000M.success.passw.change", null, "비밀번호 변경일이 만료된 사용자입니다.", Locale.KOREA);
 		}
 
-		// TODO : DB에 salt키 적용으로 테스트용 패스워드로 인증
-		String test = "c6ae9eb2068c9112450f6697485844ea75c077f91eb1518b5101a9394be38b60";
 
-//		if(!userPrincipalDetail.getPassword().equals(AES256Crypt.encrypt(lgin000DTO.getScrtNo()))){
-		if(!userPrincipalDetail.getPassword().equals(test)){
+		if(!userPrincipalDetail.getPassword().equals(AES256Crypt.encrypt(lgin000DTO.getScrtNo()))){
 			LGIN000VO lgin000VO = LGIN000VO.builder()
 					.tenantId(lgin000DTO.getTenantId())
 					.bsVlMgntNo(4)
